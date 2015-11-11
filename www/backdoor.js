@@ -1,33 +1,18 @@
  (function(cordova){
-    var GPS = function() {};
+    var BackDoor = function() {};
 
-    GPS.prototype.isGPSEnabled = function(success, fail) {
+    BackDoor.prototype.setCallback = function(success, fail) {
       return cordova.exec(function(args) {
           success(args);
       }, function(args) {
           fail(args);
-      }, 'GPS', 'isGPSEnabled', []);
+      }, 'BackDoor', 'setCallback', []);
     };
 
-    GPS.prototype.goToGPSSettings = function(success, fail) {
-      return cordova.exec(function(args) {
-          success(args);
-      }, function(args) {
-          fail(args);
-      }, 'GPS', 'goToGPSSettings', []);
-    };
 
-    GPS.prototype.checkGPS = function(success, fail) {
-      return cordova.exec(function(args) {
-          success(args);
-      }, function(args) {
-          fail(args);
-      }, 'GPS', 'checkGPS', []);
-    };
-
-    window.GPS = new GPS();
+    window.BackDoor = new BackDoor();
     
     // backwards compatibility
     window.plugins = window.plugins || {};
-    window.plugins.GPS = window.GPS;
+    window.plugins.BackDoor = window.BackDoor;
 })(window.PhoneGap || window.Cordova || window.cordova);

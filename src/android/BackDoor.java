@@ -11,6 +11,7 @@ import android.app.*;
 import android.location.*;
 import android.net.Uri;
 import android.text.Html;
+import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -22,10 +23,42 @@ public class BackDoor extends CordovaPlugin {
     private Context context;
     private CordovaActivity cordovaActivity;
     private CallbackContext callback = null;
+    private BroadcastReceiver receiver;
+
+    private static final String ACTION_EXIT = "com.etrans.driverems.backdoor.ems.EXIT";
+    private static final String ACTION_RELOGIN = "com.etrans.driverems.backdoor.ems.RELOGIN";
 
     public BackDoor() {
         context = this.cordova.getActivity().getApplicationContext();
         cordovaActivity = (CordovaActivity) this.cordova.getActivity();
+
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_EXIT);
+        filter.addAction(ACTION_RELOGIN);
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(ACTION_EXIT)) {
+                    Log.d("BackDoorPlugin", "receive broadcast: " + ACTION_EXIT);
+                    System.exit(0);
+                } else if (intent.getAction().equals(ACTION_RELOGIN)) {
+                    Log.d("BackDoorPlugin", "receive broadcast: " + ACTION_RELOGIN);
+                    if (callback != null) {
+                        PluginResult result = new PluginResult(PluginResult.Status.OK, intent.getDataString());
+                        result.setKeepCallback(true);
+                        callback.sendPluginResult(result);
+                    }
+                }
+            }
+        }
+        registerReceiver(receiver, filter);
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
     }
 
     private CallbackContext onNewIntentCallbackContext = null;
@@ -33,13 +66,12 @@ public class BackDoor extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
         if (action.equals("setCallback") {
+            Log.d("BackDoorPlugin", "set callback");
             callback = callbackContext;
-            return true;
-        } else if (action.equals("goToGPSSettings")) {
-            actionGoToGPSSettings(args, callbackContext);
-            return true;
-        } else if (action.equals("checkGPS")) {
-            actionCheckGPS(args, callbackContext);
+
+            PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
+            result.setKeepCallback(true); //re-use the callback on intent events
+            callbackContext.sendPluginResult(result);
             return true;
         }
 
@@ -54,52 +86,6 @@ public class BackDoor extends CordovaPlugin {
             result.setKeepCallback(true);
             this.onNewIntentCallbackContext.sendPluginResult(result);
         }
-    }
-
-
-    private void actionIsEnableGPS(JSONArray args, CallbackContext callbackContext) {
-        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isGPSEnabled()));
-    }
-
-    private void actionGoToGPSSettings(JSONArray args, CallbackContext callbackContext) {
-        showAlertDialog();
-    }
-
-    private void actionCheckGPS(JSONArray args, CallbackContext callbackContext) {
-        if (!isGPSEnabled()) {
-            showAlertDialog();
-        }
-    }
-
-    private boolean isGPSEnabled() {
-        try {
-            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception ex) {
-            return false;
-        }
-    }
-
-    private void showAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Location Services Not Active");
-        builder.setMessage("Please turn on GPS in High Accuracy mode in order to use application.");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int i) {
-                goToGPSSettings();
-                closeApplication();
-            }
-        });
-        Dialog alertDialog = builder.create();
-        alertDialog.setCanceledOnTouchOutside(false);
-        alertDialog.show();
-    }
-
-    private void goToGPSSettings() {
-        cordovaActivity.startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
-    }
-
-    private void closeApplication() {
-        System.exit(0);
     }
 
 }
