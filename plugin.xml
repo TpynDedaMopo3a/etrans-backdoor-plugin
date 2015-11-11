@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
+        id="com.etrans.cordova.plugin.backdoor"
+        version="1.0.0">
+    <name>BackDoor</name>
+    <description>BackDoor for Etrans Application</description>
+    <license>MIT</license>
+    <keywords>cordova,backdoor</keywords>
+
+    <js-module src="www/backdoor.js" name="BackDoor">
+        <clobbers target="BackDoor"/>
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+
+        <!--<config-file target="AndroidManifest.xml" parent="/*">-->
+        <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
+        <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
+        <!--</config-file>-->
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <receiver android:name="com.etrans.cordova.plugin.backdoor.BackDoorReceiver" android:enabled="true"
+                      android:exported="true">
+                <intent-filter>
+                    <action android:name="com.etrans.driverems.backdoor.ems.EXIT"/>
+                </intent-filter>
+            </receiver>
+        </config-file>
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="BackDoor">
+                <param name="android-package" value="com.etrans.cordova.plugin.backdoor.BackDoor"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/BackDoor.java" target-dir="src/com/etrans/cordova/plugin/backdoor"/>
+        <source-file src="src/android/BackDoorReceiver.java" target-dir="src/com/etrans/cordova/plugin/backdoor"/>
+    </platform>
+</plugin>
