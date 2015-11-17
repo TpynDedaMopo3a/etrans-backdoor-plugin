@@ -1,6 +1,14 @@
  (function(cordova){
     var BackDoor = function() {};
 
+    BackDoor.prototype.setAppVersion = function(appVersion) {
+      return cordova.exec(function(args) {
+//          success(args);
+      }, function(args) {
+//          fail(args);
+      }, 'BackDoor', 'setAppVersion', [appVersion]);
+    };
+
     BackDoor.prototype.setCallback = function(success, fail) {
       return cordova.exec(function(args) {
           success(args);
@@ -11,7 +19,7 @@
 
 
     window.BackDoor = new BackDoor();
-    
+
     // backwards compatibility
     window.plugins = window.plugins || {};
     window.plugins.BackDoor = window.BackDoor;

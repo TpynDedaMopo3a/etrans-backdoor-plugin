@@ -20,16 +20,18 @@ import org.apache.cordova.PluginResult;
 
 public class BackDoor extends CordovaPlugin {
 
-    private Context context;
+    private Context context = null;
     private CordovaActivity cordovaActivity;
     private CallbackContext callback = null;
     private BroadcastReceiver receiver;
+
+    private String appVersion = "none";
 
     private static final String ACTION_EXIT = "com.etrans.driverems.backdoor.ems.EXIT";
     private static final String ACTION_RELOGIN = "com.etrans.driverems.backdoor.ems.RELOGIN";
 
     public BackDoor() {
-        context = this.cordova.getActivity().getApplicationContext();
+        /*context = this.cordova.getActivity().getApplicationContext();
         cordovaActivity = (CordovaActivity) this.cordova.getActivity();
 
 
@@ -52,20 +54,54 @@ public class BackDoor extends CordovaPlugin {
                     }
                 }
             }
-        }
-        registerReceiver(receiver, filter);
+        };
+        context.registerReceiver(receiver, filter);*/
     }
 
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(receiver);
+    private void initVars(){
+        if(context == null){
+            cordovaActivity = (CordovaActivity) this.cordova.getActivity();
+            context = cordovaActivity.getBaseContext();
+
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ACTION_EXIT);
+            filter.addAction(ACTION_RELOGIN);
+
+            receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (intent.getAction().equals(ACTION_EXIT)) {
+                        Log.d("BackDoorPlugin", "receive broadcast: " + ACTION_EXIT);
+                        System.exit(0);
+                    } else if (intent.getAction().equals(ACTION_RELOGIN)) {
+                        Log.d("BackDoorPlugin", "receive broadcast: " + ACTION_RELOGIN);
+                        if (callback != null) {
+                            PluginResult result = new PluginResult(PluginResult.Status.OK, intent.getDataString());
+                            result.setKeepCallback(true);
+                            callback.sendPluginResult(result);
+                        }
+                    }
+                }
+            };
+            context.registerReceiver(receiver, filter);
+        }
     }
 
     private CallbackContext onNewIntentCallbackContext = null;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
-        if (action.equals("setCallback") {
+        initVars();
+        if (action.equals("setAppVersion")) {
+            Log.d("BackDoorPlugin", "setAppVersion");
+
+            appVersion = args.getString(0);
+
+            PluginResult result = new PluginResult(PluginResult.Status.OK);
+            callbackContext.sendPluginResult(result);
+            return true;
+        }
+        else if (action.equals("setCallback")) {
             Log.d("BackDoorPlugin", "set callback");
             callback = callbackContext;
 
