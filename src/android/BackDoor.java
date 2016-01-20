@@ -25,6 +25,8 @@ import android.location.*;
 import android.net.Uri;
 import android.text.Html;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -178,7 +180,7 @@ public class BackDoor extends CordovaPlugin {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/Download/" + apkFileName)), "application/vnd.android.package-archive");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Configs.getContext().startActivity(intent);
+            context.startActivity(intent);
         } catch (IOException e) {
             System.out.println("Update error: " + e.toString());
         }
