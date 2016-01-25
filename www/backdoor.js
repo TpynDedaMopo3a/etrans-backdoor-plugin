@@ -17,12 +17,12 @@
       }, 'BackDoor', 'setCallback', []);
     };
 
-    BackDoor.prototype.updateApp = function(serverAddress, success, fail) {
+    BackDoor.prototype.updateApp = function(serverAddress, appName, success, fail) {
       return cordova.exec(function(args) {
           success(args);
       }, function(args) {
           fail(args);
-      }, 'BackDoor', 'setCallback', [serverAddress]);
+      }, 'BackDoor', 'setCallback', [serverAddress, appName]);
     };
 
 

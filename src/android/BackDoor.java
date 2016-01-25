@@ -134,8 +134,9 @@ public class BackDoor extends CordovaPlugin {
             } else if (action.equals("updateApp")) {
                 Log.d("BackDoorPlugin", "update app");
                 String url = args.getString(0);
+                String appName = args.getString(1);
 
-                updateApp(url, "ems_driver_last");
+                updateApp(url, appName);
 
                 PluginResult result = new PluginResult(PluginResult.Status.OK);
                 callbackContext.sendPluginResult(result);
