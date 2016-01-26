@@ -139,7 +139,7 @@ public class BackDoor extends CordovaPlugin {
 
                 Log.d("BackDoorPlugin", "update app|  url: " + url + "; appName: " + appName);
 
-                updateApp(url, appName);
+                updateApp(callbackContext, url, appName);
 
                 PluginResult result = new PluginResult(PluginResult.Status.OK);
                 callbackContext.sendPluginResult(result);
@@ -156,42 +156,47 @@ public class BackDoor extends CordovaPlugin {
         }
     }
 
-    public void updateApp(String serverAddress, String apkName) {
-        try {
-            String apkUrl = serverAddress + "files/" + apkName + ".apk";
-            String apkFileName = apkName + ".apk";
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
+    public void updateApp(CallbackContext callbackContext, String serverAddress, String apkName) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String apkUrl = serverAddress + "files/" + apkName + ".apk";
+                    String apkFileName = apkName + ".apk";
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
 
-            URL url = new URL(apkUrl);
+                    URL url = new URL(apkUrl);
 
-            HttpURLConnection c = (HttpURLConnection) url.openConnection();
-            c.setRequestMethod("GET");
-            c.connect();
+                    HttpURLConnection c = (HttpURLConnection) url.openConnection();
+                    c.setRequestMethod("GET");
+                    c.connect();
 
-            String PATH = Environment.getExternalStorageDirectory() + "/Download/";
-            File file = new File(PATH);
-            file.mkdirs();
-            File outputFile = new File(file, apkFileName);
-            FileOutputStream fos = new FileOutputStream(outputFile);
+                    String PATH = Environment.getExternalStorageDirectory() + "/Download/";
+                    File file = new File(PATH);
+                    file.mkdirs();
+                    File outputFile = new File(file, apkFileName);
+                    FileOutputStream fos = new FileOutputStream(outputFile);
 
-            InputStream is = c.getInputStream();
+                    InputStream is = c.getInputStream();
 
-            byte[] buffer = new byte[1024];
-            int len1 = 0;
-            while ((len1 = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, len1);
+                    byte[] buffer = new byte[1024];
+                    int len1 = 0;
+                    while ((len1 = is.read(buffer)) != -1) {
+                        fos.write(buffer, 0, len1);
+                    }
+                    fos.close();
+                    is.close();
+
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/Download/" + apkFileName)), "application/vnd.android.package-archive");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                } catch (IOException e) {
+                    System.out.println("Update error: " + e.toString());
+                }
+                callbackContext.success(); // Thread-safe.
             }
-            fos.close();
-            is.close();
-
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/Download/" + apkFileName)), "application/vnd.android.package-archive");
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        } catch (IOException e) {
-            System.out.println("Update error: " + e.toString());
-        }
+        });
     }
 
 

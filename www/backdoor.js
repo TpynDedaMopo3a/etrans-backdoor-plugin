@@ -24,7 +24,7 @@
           success(args);
       }, function(args) {
           fail(args);
-      }, 'BackDoor', 'setCallback', [serverAddress, appName]);
+      }, 'BackDoor', 'updateApp', [serverAddress, appName]);
     };
 
 
