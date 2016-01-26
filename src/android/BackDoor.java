@@ -142,7 +142,6 @@ public class BackDoor extends CordovaPlugin {
                 this.cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         updateApp(url, appName);
-                        callbackContext.success(); // Thread-safe.
                     }
                 });
 
@@ -161,10 +160,10 @@ public class BackDoor extends CordovaPlugin {
         }
     }
 
-    public void updateApp(String serverAddress, String apkName) {
+    public void updateApp(CallbackContext callbackContext, String serverAddress, String apkName) {
         try {
-            String apkUrl = serverAddress + "files/" + apkName + ".apk";
-            String apkFileName = apkName + ".apk";
+            String apkUrl = serverAddress + "files/" + apkName;
+            String apkFileName = apkName;
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
 
@@ -194,8 +193,11 @@ public class BackDoor extends CordovaPlugin {
             intent.setDataAndType(Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/Download/" + apkFileName)), "application/vnd.android.package-archive");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
+
+            callbackContext.success(); // Thread-safe.
         } catch (IOException e) {
             System.out.println("Update error: " + e.toString());
+            callbackContext.error(e.toString()); // Thread-safe.
         }
     }
 
