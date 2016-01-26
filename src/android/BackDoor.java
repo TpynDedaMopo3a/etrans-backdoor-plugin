@@ -133,8 +133,11 @@ public class BackDoor extends CordovaPlugin {
                 return true;
             } else if (action.equals("updateApp")) {
                 Log.d("BackDoorPlugin", "update app");
+
                 String url = args.getString(0);
                 String appName = args.getString(1);
+
+                Log.d("BackDoorPlugin", "update app|  url: " + url + "; appName: " + appName);
 
                 updateApp(url, appName);
 

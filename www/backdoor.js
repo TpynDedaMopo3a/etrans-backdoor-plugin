@@ -2,6 +2,7 @@
     var BackDoor = function() {};
 
     BackDoor.prototype.setAppVersion = function(appVersion) {
+    console.log("BackDoor.js - setAppVersion|  appVersion: " + appVersion + ";");
       return cordova.exec(function(args) {
 //          success(args);
       }, function(args) {
@@ -18,6 +19,7 @@
     };
 
     BackDoor.prototype.updateApp = function(serverAddress, appName, success, fail) {
+    console.log("BackDoor.js - updateApp|  serverAddress: " + serverAddress + "; appName: " + appName + ";");
       return cordova.exec(function(args) {
           success(args);
       }, function(args) {
