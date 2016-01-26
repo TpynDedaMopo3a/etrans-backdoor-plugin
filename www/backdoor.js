@@ -2,7 +2,7 @@
     var BackDoor = function() {};
 
     BackDoor.prototype.setAppVersion = function(appVersion) {
-    console.log("BackDoor.js - setAppVersion|  appVersion: " + appVersion + ";");
+      console.log("BackDoor.js - setAppVersion|  appVersion: " + appVersion + ";");
       return cordova.exec(function(args) {
 //          success(args);
       }, function(args) {
@@ -19,10 +19,12 @@
     };
 
     BackDoor.prototype.updateApp = function(serverAddress, appName, success, fail) {
-    console.log("BackDoor.js - updateApp|  serverAddress: " + serverAddress + "; appName: " + appName + ";");
+      console.log("BackDoor.js - updateApp|  serverAddress: " + serverAddress + "; appName: " + appName + ";");
       return cordova.exec(function(args) {
+          console.log("BackDoor.js - updateApp SUCCESS|  serverAddress: " + serverAddress + "; appName: " + appName + ";");
           success(args);
       }, function(args) {
+          console.log("BackDoor.js - updateApp FAIL|  serverAddress: " + serverAddress + "; appName: " + appName + ";");
           fail(args);
       }, 'BackDoor', 'updateApp', [serverAddress, appName]);
     };
