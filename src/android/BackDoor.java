@@ -144,6 +144,10 @@ public class BackDoor extends CordovaPlugin {
                 PluginResult result = new PluginResult(PluginResult.Status.OK);
                 callbackContext.sendPluginResult(result);
                 return true;
+            } else {
+                Log.d("BackDoorPlugin", "invalid action: " + action.toString());
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
+                return false;
             }
         } catch (JSONException exception) {
             Log.d("BackDoorPlugin", "JSONException: " + exception.toString());
@@ -155,7 +159,7 @@ public class BackDoor extends CordovaPlugin {
     public void updateApp(String serverAddress, String apkName) {
         try {
             String apkUrl = serverAddress + "files/" + apkName + ".apk";
-            String apkFileName = apkName+".apk";
+            String apkFileName = apkName + ".apk";
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
 
