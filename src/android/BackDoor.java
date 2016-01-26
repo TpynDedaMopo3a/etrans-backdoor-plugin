@@ -112,7 +112,7 @@ public class BackDoor extends CordovaPlugin {
     private CallbackContext onNewIntentCallbackContext = null;
 
     @Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
+    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) {
         initVars();
         try {
             if (action.equals("setAppVersion")) {
@@ -134,14 +134,14 @@ public class BackDoor extends CordovaPlugin {
             } else if (action.equals("updateApp")) {
                 Log.d("BackDoorPlugin", "update app");
 
-                String url = args.getString(0);
-                String appName = args.getString(1);
+                final String url = args.getString(0);
+                final String appName = args.getString(1);
 
                 Log.d("BackDoorPlugin", "update app|  url: " + url + "; appName: " + appName);
 
                 this.cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        updateApp(url, appName);
+                        updateApp(callbackContext, url, appName);
                     }
                 });
 
@@ -196,7 +196,7 @@ public class BackDoor extends CordovaPlugin {
 
             callbackContext.success(); // Thread-safe.
         } catch (IOException e) {
-            System.out.println("Update error: " + e.toString());
+            Log.d("BackDoorPlugin", "Update error: " + e.toString());
             callbackContext.error(e.toString()); // Thread-safe.
         }
     }
