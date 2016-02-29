@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.StrictMode;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.widget.Toast;
 
 import java.io.File;
@@ -119,6 +121,15 @@ public class BackDoor extends CordovaPlugin {
                 Log.d("BackDoorPlugin", "setAppVersion");
 
 //                appVersion = args.getString(0);
+
+                PluginResult result = new PluginResult(PluginResult.Status.OK);
+                callbackContext.sendPluginResult(result);
+                return true;
+            } else if (action.equals("keepScreenOn")) {
+                Log.d("BackDoorPlugin", "keepScreenOn");
+                PowerManager powerManager = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
+                WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "EMS Lock");
+                wakeLock.acquire();
 
                 PluginResult result = new PluginResult(PluginResult.Status.OK);
                 callbackContext.sendPluginResult(result);

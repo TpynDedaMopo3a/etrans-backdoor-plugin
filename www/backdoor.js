@@ -10,6 +10,14 @@
       }, 'BackDoor', 'setAppVersion', [appVersion]);
     };
 
+    BackDoor.prototype.keepScreenOn = function(success, fail) {
+      return cordova.exec(function(args) {
+          success(args);
+      }, function(args) {
+          fail(args);
+      }, 'BackDoor', 'keepScreenOn', []);
+    };
+
     BackDoor.prototype.setCallback = function(success, fail) {
       return cordova.exec(function(args) {
           success(args);
